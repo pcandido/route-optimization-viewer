@@ -202,8 +202,8 @@
 				if (solution) {
 
 					for (t in solution.thieves) {
-						stroke(thievesColor[t]);
-						fill(thievesColor[t]);
+						stroke(thievesColor[t % thievesColor.length]);
+						fill(thievesColor[t % thievesColor.length]);
 						var thief = solution.thieves[t];
 
 						var last = instance.getStart();
@@ -246,8 +246,8 @@
 						for (t in solution.thieves) {
 							var thief = solution.thieves[t];
 							if (thief.containsNode(selected.id)) {
-								stroke(thievesColor[t]);
-								fill(thievesColor[t]);
+								stroke(thievesColor[t % thievesColor.length]);
+								fill(thievesColor[t % thievesColor.length]);
 
 								var data = thief.data[selected.id];
 								var before = thief.nodeBefore(selected.id);
