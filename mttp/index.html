@@ -143,7 +143,7 @@
 				table.find('tbody').append($('<tr><td>nodes</td><td>' + instance.nodes.length + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>items</td><td>' + instance.items.length + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>capacity</td><td>' + instance.capacity + '</td></tr>'));
-				table.find('tbody').append($('<tr><td>max time</td><td>' + instance.max_time + '</td></tr>'));
+				table.find('tbody').append($('<tr><td>renting ratio</td><td>' + instance.rentingRatio + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>min speed</td><td>' + instance.min_speed + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>max speed</td><td>' + instance.max_speed + '</td></tr>'));
 
@@ -162,11 +162,29 @@
 
 				table.find('tbody').append($('<tr><td>thieves</td><td>' + solution.thieves.length + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>profit</td><td>' + solution.profit + '</td></tr>'));
+				table.find('tbody').append($('<tr><td>renting</td><td>' + solution.renting.toFixed(2) + '</td></tr>'));
+				table.find('tbody').append($('<tr><td>value</td><td>' + solution.value.toFixed(2) + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>weight</td><td>' + solution.weight + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>time</td><td>' + solution.time.toFixed(2) + '</td></tr>'));
 				table.find('tbody').append($('<tr><td>valid</td><td>' + solution.valid + '</td></tr>'));
 
 				$('#info-solution').append(table);
+
+				for (t in solution.thieves) {
+					var thief = solution.thieves[t];
+
+					var subtable = $('<h4>thief ' + t + '</h4><table class="table"><tbody></tbody></table>');
+
+					subtable.find('tbody').append($('<tr><td>profit</td><td>' + thief.profit + '</td></tr>'));
+					subtable.find('tbody').append($('<tr><td>renting</td><td>' + thief.renting.toFixed(2) + '</td></tr>'));
+					subtable.find('tbody').append($('<tr><td>value</td><td>' + thief.value.toFixed(2) + '</td></tr>'));
+					subtable.find('tbody').append($('<tr><td>weight</td><td>' + thief.weight + '</td></tr>'));
+					subtable.find('tbody').append($('<tr><td>time</td><td>' + thief.time.toFixed(2) + '</td></tr>'));
+					subtable.find('tbody').append($('<tr><td>valid</td><td>' + thief.valid + '</td></tr>'));
+
+					$('#info-solution').append(subtable);
+				}
+
 				redraw();
 			});
 		}
@@ -413,7 +431,7 @@
 			this.name = "";
 			this.type = "";
 			this.capacity = 0;
-			this.max_time = 0;
+			this.rentingRatio = 0;
 			this.min_speed = 0;
 			this.max_speed = 0;
 			this.nodes = [];
@@ -466,9 +484,9 @@
 				var itemCount = parseInt(read(3));
 
 				this.capacity = parseFloat(read(4));
-				this.max_time = parseFloat(read(5));
-				this.min_speed = parseFloat(read(6));
-				this.max_speed = parseFloat(read(7));
+				this.min_speed = parseFloat(read(5));
+				this.max_speed = parseFloat(read(6));
+				this.rentingRatio = parseFloat(read(7));
 
 				this.nodes = lines.slice(10, nodeCount + 10).map(function (n) {
 					var parts = n.split(' ');
@@ -505,7 +523,9 @@
 			this.route = route;
 			this.items = items;
 
+			this.renting = 0;
 			this.profit = 0;
+			this.value = 0;
 			this.weight = 0;
 			this.time = 0;
 			this.valid = true;
@@ -607,9 +627,10 @@
 					speedAfter: instance.getSpeed(this.weight)
 				};
 
+				this.renting = instance.rentingRatio * this.time;
+				this.value = this.profit - this.renting;
+
 				if (this.weight > instance.capacity)
-					valid = false;
-				else if (this.time > instance.max_time)
 					valid = false;
 				else if (new Set(this.items).size != this.items.length) {
 					valid = false;
@@ -627,6 +648,8 @@
 
 			this.thieves = [];
 			this.profit = 0;
+			this.renting = 0;
+			this.value = 0;
 			this.weight = 0;
 			this.time = 0;
 			this.valid = true;
@@ -654,6 +677,8 @@
 				}
 
 				this.profit = this.thieves.map(t => t.profit).reduce((a, b) => a + b, 0);
+				this.renting = this.thieves.map(t => t.renting).reduce((a, b) => a + b, 0);
+				this.value = this.thieves.map(t => t.value).reduce((a, b) => a + b, 0);
 				this.weight = this.thieves.map(t => t.weight).reduce((a, b) => a + b, 0);
 				this.time = this.thieves.map(t => t.time).reduce((a, b) => Math.max(a, b), 0);
 				this.valid = this.thieves.map(t => t.valid).reduce((a, b) => a && b, true);
