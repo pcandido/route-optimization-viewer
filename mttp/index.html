@@ -680,7 +680,7 @@
 				this.renting = this.thieves.map(t => t.renting).reduce((a, b) => a + b, 0);
 				this.value = this.thieves.map(t => t.value).reduce((a, b) => a + b, 0);
 				this.weight = this.thieves.map(t => t.weight).reduce((a, b) => a + b, 0);
-				this.time = this.thieves.map(t => t.time).reduce((a, b) => Math.max(a, b), 0);
+				this.time = this.thieves.map(t => t.time).reduce((a, b) => a + b, 0);
 				this.valid = this.thieves.map(t => t.valid).reduce((a, b) => a && b, true);
 
 				this.valid = this.valid && (this.getItems().length === new Set(this.getItems()).size);
