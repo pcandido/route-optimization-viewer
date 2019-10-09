@@ -471,7 +471,7 @@
 			}
 
 			this._load = function (data) {
-				var lines = data.split('\n');
+				var lines = data.split('\n').map(a => a.trim()).filter(a => a !== '');
 
 				function read(line) {
 					return lines[line].split(':')[1].trim();
@@ -663,7 +663,7 @@
 			}
 
 			this._load = function (data) {
-				var lines = data.trim().replace(/[\[\]]/g, '').split('\n');
+				var lines = data.trim().replace(/[\[\]]/g, '').split('\n').map(a => a.trim()).filter(a => a !== '');
 
 				if (lines.length % 2 !== 0) {
 					alert('invalid input format, it was expected a pair number of lines');
